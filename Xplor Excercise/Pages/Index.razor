@@ -1,0 +1,78 @@
+﻿@page "/"
+@using System.Text.Json
+@using Xplor_Excercise.Data
+
+<PageTitle>Index</PageTitle>
+
+<div class="container">
+    <div class="form-group pull-right">
+        <input type="text" class="search form-control" placeholder="What you looking for?" @bind="searchString" @bind:event="oninput">
+    </div>
+    <span class="counter pull-right"></span>
+    <table class="table table-dark" style="vertical-align: middle">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">First</th>
+                <th scope="col">Last</th>
+                <th scope="col">Email</th>
+                <th scope="col">Phone Number</th>
+                <th scope="col">Country Code</th>
+                <th scope="col">Gender</th>
+                <th scope="col">Balance</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (customers != null)
+            {
+                foreach (var customer in displayCustomers)
+                {
+                    string deleteUrl = "https://getinvoices.azurewebsites.net/api/Customer/" + customer.Id;
+                    <tr>
+                        <th scope="row">@customer.Id</th>
+                        <td>@customer.FirstName</td>
+                        <td>@customer.LastName</td>
+                        <td><a href="mailto: @customer.Email">Send Email</a></td>
+                        <td>@customer.Phone_Number</td>
+                        <td>@customer.Country_Code</td>
+                        <td>@customer.Gender</td>
+                        <td style="text-align: right">$@customer.Balance</td>
+                        <td><button type="button" class="btn btn-primary btn-block">Edit</button></td>
+                        <td><button type="button" class="btn btn-danger btn-block" href="@deleteUrl">Delete</button></td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+
+</div>
+@code {
+    static readonly HttpClient client = new HttpClient();
+
+    string searchString = string.Empty;
+    HttpRequestMessage requestMessage;
+    HttpResponseMessage responseMessage;
+    HttpClient http;
+    List<Customer> displayCustomers => customers.Where(s => s.FirstName.ToUpper().Contains(searchString.ToUpper())).ToList();
+    List<Customer> customers;
+
+    protected override async Task OnInitializedAsync()
+    {
+        http = new HttpClient();
+        requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(@"https://getinvoices.azurewebsites.net/api/Customers")
+            };
+
+        var options = new JsonSerializerOptions();
+        options.PropertyNameCaseInsensitive = true;
+
+        responseMessage = await http.SendAsync(requestMessage);
+        customers = JsonSerializer.Deserialize<List<Customer>>(await responseMessage.Content.ReadAsStringAsync(), options);
+    }
+
+
+}
