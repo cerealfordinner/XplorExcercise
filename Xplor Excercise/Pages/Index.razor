@@ -29,7 +29,6 @@
             {
                 foreach (var customer in displayCustomers)
                 {
-                    string deleteUrl = "https://getinvoices.azurewebsites.net/api/Customer/" + customer.Id;
                     <tr>
                         <th scope="row">@customer.Id</th>
                         <td>@customer.FirstName</td>
@@ -40,7 +39,7 @@
                         <td>@customer.Gender</td>
                         <td style="text-align: right">$@customer.Balance</td>
                         <td><button type="button" class="btn btn-primary btn-block">Edit</button></td>
-                        <td><button type="button" class="btn btn-danger btn-block" href="@deleteUrl">Delete</button></td>
+                        <td><button type="button" class="btn btn-danger btn-block" @onclick="(() => {Customer.DeleteCustomer(customer.Id); customers.Remove(customer);})">Delete</button></td>
                     </tr>
                 }
             }
@@ -73,6 +72,5 @@
         responseMessage = await http.SendAsync(requestMessage);
         customers = JsonSerializer.Deserialize<List<Customer>>(await responseMessage.Content.ReadAsStringAsync(), options);
     }
-
 
 }

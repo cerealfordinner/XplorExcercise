@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.Web;
+using static System.Net.WebRequestMethods;
 
 namespace Xplor_Excercise.Data
 {
@@ -27,5 +28,13 @@ namespace Xplor_Excercise.Data
         public string Phone_Number { get; set; }
         public string Currency { get; set; }
 
+        public static HttpResponseMessage DeleteCustomer(string id)
+        {
+            var client = new HttpClient();
+            client.BaseAddress = new Uri("https://getinvoices.azurewebsites.net/api/Customer/");
+            client.DefaultRequestHeaders.Accept.Clear();
+            HttpResponseMessage response = client.DeleteAsync(id).Result;
+            return response;
+        }
     }
 }
