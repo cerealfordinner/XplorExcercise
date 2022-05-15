@@ -1,0 +1,118 @@
+﻿@page "/create"
+@using Newtonsoft.Json
+@using System.Text
+@using Xplor_Excercise.Data
+
+<style>
+    body {
+        background-color: #3B3936;
+    }
+</style>
+
+<container>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#"><i class="far fa-user mx-4"></i>CustomerLoader</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#"><i class="fas fa-home mx-2"></i>Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/create"><i class="fas fa-plus-circle mx-2"></i>Create</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</container>
+
+<div class="container mt-4">
+    <EditForm Model="@customerModel" OnSubmit="@HandleValidSubmit">
+        <div class="row mb-4">
+            <div class="form-outline mb-4">
+                <InputText class="form-control" @bind-Value="newCustomerId" />
+                <label class="form-label" for="form6Example6"><p class="text-light">ID</p></label>
+            </div>
+
+            <div class="col">
+                <div class="form-outline">
+                    <InputText class="form-control" @bind-Value="newCustomerFirstName" />
+                    <label class="form-label" for="form6Example1"><p class="text-light">First name</p></label>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-outline">
+                    <InputText class="form-control" @bind-Value="newCustomerLastName" />
+                    <label class="form-label" for="form6Example2"><p class="text-light">Last name</p></label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-outline mb-4">
+            <InputSelect id="gender" @bind-Value="newCustomerGender">
+                <option value="m">M</option>
+                <option value="m">F</option>
+            </InputSelect>
+            <label class="form-label" for="form6Example3"><p class="text-light">Gender</p></label>
+        </div>
+
+        <div class="form-outline mb-4">
+            <InputText class="form-control" @bind-Value="newCustomerEmail" />
+            <label class="form-label" for="form6Example3"><p class="text-light">Email</p></label>
+        </div>
+
+        <div class="form-outline mb-4">
+            <InputText class="form-control" @bind-Value="newCustomerPhoneNumber" />
+            <label class="form-label" for="form6Example4"><p class="text-light">Phone Number</p></label>
+        </div>
+
+        <div class="form-outline mb-4">
+            <InputText class="form-control" @bind-Value="newCustomerCountryCode" />
+            <label class="form-label" for="form6Example5"><p class="text-light">Country Code</p></label>
+        </div>
+
+        <div class="form-outline mb-4">
+            <InputNumber class="form-control" @bind-Value="newCustomerBalance" />
+            <label class="form-label" for="form6Example6"><p class="text-light">Balance</p></label>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block mb-4">Create customer</button>
+    </EditForm>
+</div>
+
+@code {
+    Customer customerModel = new Customer();
+
+    string newCustomerId;
+    string newCustomerFirstName;
+    string newCustomerLastName;
+    string newCustomerGender;
+    string newCustomerEmail;
+    string newCustomerPhoneNumber;
+    string newCustomerCountryCode;
+    decimal newCustomerBalance;
+
+    public void HandleValidSubmit()
+    {
+        HttpClient client = new HttpClient();
+        Uri endpoint = new Uri("https://getinvoices.azurewebsites.net/api/Customer");
+
+        Customer newCustomer = new Customer()
+            {
+                Id = newCustomerId,
+                FirstName = newCustomerFirstName,
+                LastName = newCustomerLastName,
+                Gender = newCustomerGender,
+                Email = newCustomerEmail,
+                Phone_Number = newCustomerPhoneNumber,
+                Country_Code = newCustomerCountryCode,
+                Balance = newCustomerBalance
+            };
+
+        var newCustomerJson = JsonConvert.SerializeObject(newCustomer);
+        Console.WriteLine(newCustomerJson);
+        var payload = new StringContent(newCustomerJson, Encoding.UTF8, "application/json");
+        var result = client.PostAsync(endpoint, payload).Result.Content.ReadAsStringAsync().Result;
+    }
+}
