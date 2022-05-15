@@ -4,7 +4,7 @@
   <p align="center">
     Using Blazor and .NET to perform CRUD operations on a third-party API!
     <br />
-    <a href="https://github.com/othneildrew/Best-README-Template">View Demo</a>
+    <a href="">View Demo</a>
   </p>
 </div>
 
